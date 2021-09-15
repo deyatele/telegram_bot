@@ -1,4 +1,5 @@
-const token = '1991658928:AAEKCK09XXETBaOgTKEvn184uqoFEZtne0E';
+require('dotenv').config();
+const token = process.env.TOKEN;
 process.env.NTBA_FIX_319 = 1;
 const TelegramApi = require('node-telegram-bot-api');
 const { gameOptions, againOptions } = require('./options');
