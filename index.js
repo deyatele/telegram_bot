@@ -17,7 +17,7 @@ const gameStart = async (chatId) => {
     );
     const randomNumber = Math.floor(Math.random() * 10);
     chats.gameQ = randomNumber;
-    console.log(chats.gameQ)
+    
     await bot.sendMessage(chatId, `Выбери число:`, gameOptions);
   } catch (e) {
     console.log(e);
@@ -75,7 +75,9 @@ const start = async () => {
       }
 
       if (text === '/info' || text === 'info') {
-        const user = await UserModel.findOne({ chatId });
+        const user = await UserModel.findOne({ 
+         chatId
+           });
         return bot.sendMessage(
           chatId,
           `${msg.from.first_name}, в игре у тебя правильных ответов ${user.right}, а неправильных: ${user.wrong} `,
