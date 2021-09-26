@@ -1,4 +1,5 @@
-const { token } = require('./procesEnv');
+//const { token } = require('./procesEnv');
+const token = process.env.TOKEN;
 const TelegramApi = require('node-telegram-bot-api');
 const { gameOptions, againOptions } = require('./options');
 const sequelize = require('./db');
