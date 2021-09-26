@@ -1,14 +1,9 @@
 const { Sequelize } = require('sequelize');
 const {
-  DATA_BASE_URI,
-  DATA_BASE_NAME,
-  DATA_BASE_USER,
-  DATA_BASE_PORT,
-  DATA_BASE_PASSWORD,
-  DATA_BASE_HOST,
+    DATABASE_URL
 } = require('./procesEnv');
 
-module.exports = new Sequelize(DATA_BASE_URI, {
+module.exports = new Sequelize(DATABASE_URL, {
   //logging: false,// отключение логирования
   ssl: true,
   dialectOptions: {
