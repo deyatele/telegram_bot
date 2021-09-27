@@ -18,7 +18,7 @@ const gameStart = async (chatId) => {
     );
     const randomNumber = Math.floor(Math.random() * 10);
     chats.gameQ = randomNumber;
-    
+    chats.isGame = true;
     await bot.sendMessage(chatId, `Выбери число:`, gameOptions);
   } catch (e) {
     console.log(e);
@@ -29,7 +29,9 @@ const start = async () => {
   try {
     await sequelize.authenticate();
     await sequelize.sync();
+    console.log('BASE Ok');
   } catch (error) {
+    console.log('BASE :(');
     console.log(error);
   }
 
@@ -44,10 +46,16 @@ const start = async () => {
   try {
     bot.on('message', async (msg) => {
       const text = msg.text;
-      const chatId = msg.chat.id;
+      const chatId = msg.chat.id;      
       if (text === '/start' || text === 'start') {
-        console.log(chatId)
-        await UserModel.create({ chatId });
+        const user = await UserModel.findOne({
+          where: {chatId: chatId}          
+        });
+        if (user?.chatId != chatId) {
+          console.log('CREATE');
+          await UserModel.create({ chatId });
+        }
+
         chats.chatId = chatId;
         await bot.sendSticker(
           chatId,
@@ -76,9 +84,9 @@ const start = async () => {
       }
 
       if (text === '/info' || text === 'info') {
-        const user = await UserModel.findOne({ 
-         chatId
-           });
+        const user = await UserModel.findOne({
+          where: {chatId: chatId}          
+        });
         return bot.sendMessage(
           chatId,
           `${msg.from.first_name}, в игре у тебя правильных ответов ${user.right}, а неправильных: ${user.wrong} `,
@@ -96,13 +104,24 @@ const start = async () => {
     );
   }
 
-  bot.on('callback_query', async(msg) => {
+  bot.on('callback_query', async (msg) => {
     const data = msg.data;
     const chatId = msg.message.chat.id;
+
+    if (!chats.isGame && data !== '/again') {
+      return bot.sendMessage(
+        chatId,
+        `Для повтора игры нажми кнопку ниже`,
+        againOptions,
+      );
+    }
+
     if (data === '/again') {
       return gameStart(chatId);
     }
-    const user = await UserModel.findOne({ chatId });
+    const user = await UserModel.findOne({
+      where: {chatId: chatId}          
+    }); 
     if (data == chats.gameQ) {
       user.right += 1;
       await bot.sendMessage(
@@ -118,6 +137,7 @@ const start = async () => {
         againOptions,
       );
     }
+    chats.isGame = false;
     await user.save();
   });
 };
